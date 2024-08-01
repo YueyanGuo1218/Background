@@ -10,7 +10,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'ssbg=ssbg:main',
+            'ssbg=ssbg.main:main',
         ],
     },
     author='Yueyang Guo',
