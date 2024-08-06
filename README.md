@@ -6,7 +6,7 @@ Background calculator for Strand-Seq bam files.
 Download the Background repo:
 
 ```bash
-git clone <REPO_URL>
+git clone https://github.com/YueyanGuo1218/Background.git
 ```
 
 Install with pip:
