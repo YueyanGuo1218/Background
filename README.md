@@ -18,5 +18,7 @@ cd ./Background && pip install .
 Calculate background:
 
 ```bash
-ssbg /path/to/target.bam /path/to/mask.bed
+ssbg /path/to/target.bam --mask /path/to/mask.bed
 ```
+
+`--mask` is optional.
