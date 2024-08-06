@@ -15,10 +15,16 @@ Install with pip:
 cd ./Background && pip install .
 ```
 
-Calculate background:
+Calculate backgroung for a bam file:
+
+```bash
+ssbg /paty/to/target.bam
+```
+
+Calculate backgroung for a bam file, with reads in masked regions ignored:
 
 ```bash
 ssbg /path/to/target.bam --mask /path/to/mask.bed
 ```
 
-`--mask` is optional.
+
