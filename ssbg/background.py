@@ -2,6 +2,7 @@ import pysam
 from typing import NamedTuple
 import numpy as np
 import sys
+from pathlib import Path
 
 Read = NamedTuple('Read', [('chr_id', int), ('start', int)])
 
@@ -54,7 +55,14 @@ def strand_genotype(arr):
                         np.sign(arr)))
     return transformed_arr
 
-def calculate_background_chr(chr_id, chr_length, watson_starts, crick_starts, masked_regions, bin_size, read_length):
+def get_mask_array(chr_name, mask_dir):
+    mask_dir_path = Path(mask_dir)
+    for file in mask_dir_path.iterdir():
+        if file.is_file() and chr_name == file.stem:
+            mask_array = np.load(file)
+            return mask_array
+
+def calculate_background_chr(chr_id, chr_length, watson_starts, crick_starts, mask_dir, bin_size, read_length):
     size = array_size(chr_length, bin_size)
     w_count = np.zeros(array_size(chr_length, bin_size))
     c_count = np.zeros(array_size(chr_length, bin_size))
@@ -75,13 +83,12 @@ def calculate_background_chr(chr_id, chr_length, watson_starts, crick_starts, ma
     c_count = sum_by_bin(c_count, bin_size)
     strand = strand_genotype( (w_count - c_count) / (w_count + c_count) )
 
+    if mask_dir is not None:
+        mask_array = get_mask_array(f"chr{chr_id+1}", mask_dir)
+        strand = strand * mask_array
+
     print(f"working on chr{chr_id+1}")
     print(strand)
-
-    for region in masked_regions:
-        region_chr_id = ref_list.index(region.chr)
-        if region_chr_id == chr_id:
-            strand[region.start:region.end] = np.nan # label masked region as no reads
 
     ww_windows = (strand == 1)
     cc_windows = (strand == -1)
@@ -110,9 +117,7 @@ def calculate_background_chr(chr_id, chr_length, watson_starts, crick_starts, ma
 
     return ww_weight * ww_background + cc_weight * cc_background, ww_window_counts + cc_window_counts
 
-def calculate_background(chr_list, ref_list, ref_lengths, watson_starts, crick_starts, masked_regions = None, bin_size = 1_000_000, read_length = 75):
-    if masked_regions is None:
-        masked_regions = []
+def calculate_background(chr_list, ref_list, ref_lengths, watson_starts, crick_starts, mask_dir = None, bin_size = 1_000_000, read_length = 75):
     background = np.empty(len(chr_list))
     chr_weight = np.zeros_like(background)
     background.fill(np.nan)
@@ -127,15 +132,12 @@ def calculate_background(chr_list, ref_list, ref_lengths, watson_starts, crick_s
                                                                                                     chr_length,
                                                                                                     watson_starts,
                                                                                                     crick_starts,
-                                                                                                    masked_regions,
+                                                                                                    mask_dir,
                                                                                                     bin_size,
                                                                                                     read_length)
         print(background[chr_list.index(chr)]) # debug
-
     #return background, chr_weight
 
     chr_weight = chr_weight / np.sum(chr_weight)
     bg_result = np.average(background[~np.isnan(background)], weights=chr_weight[~np.isnan(background)])
-    print(bg_result)
     return bg_result
-    
