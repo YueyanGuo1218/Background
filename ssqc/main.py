@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 from .bed2array import generate_array
 from .background import process_bam_file, calculate_background
-#from .depth import calculate_depth, spikiness, half_depth_proportion, entropy
+from .depth import calculate_depth, spikiness, half_depth_proportion, etp
 
 
 def main():
@@ -60,27 +60,24 @@ def main():
     print(f"Background over whole genome: {background}")
 
     # Depth
-    pass
-    depth = 0.1231
-    depth = f"{depth:.5f}"
+    total_depth = len(watson_starts) + len(crick_starts)
+    depth = f"{total_depth}"
 
     # Spikiness
-    pass
-    spikiness = 0.1232
-    spikiness = f"{spikiness:.5f}"
+    spk = spikiness(chr_list, ref_list, ref_lengths, watson_starts, crick_starts)
+    spk = f"{spk:.5f}"
 
     # Half_depth Proportion
-    pass
-    half_depth_proportion = 0.1233
-    half_depth_proportion = f"{half_depth_proportion:.5f}"
+    half_depth = half_depth_proportion(chr_list, ref_list, ref_lengths, watson_starts, crick_starts, total_depth, mask_dir = cache_path, window_size = 1_000_000)
+    half_depth = f"{half_depth:.5f}"
 
     # Entropy
     pass
-    entropy = 0.1234
+    entropy = etp(chr_list, ref_list, ref_lengths, watson_starts, crick_starts)
     entropy = f"{entropy:.5f}"
 
     head   = "\t".join(["#filename", "background", "depth", "spikiness", "half_depth_proportion", "entropy"])
-    result = "\t".join([Path(bam_file).stem, background, depth, spikiness, half_depth_proportion, entropy])
+    result = "\t".join([Path(bam_file).stem, background, depth, spk, half_depth, entropy])
     output_file = "\n".join([head, result])
 
     if bam_file is None:    # Reading from stdin
