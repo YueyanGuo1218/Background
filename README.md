@@ -1,18 +1,23 @@
-# Background
-Background calculator for Strand-Seq bam files.
+# Strand-seq Library QC
+Quality control for Strand-Seq bam files based on measures:
+- Background
+- Depth
+- Spikiness
+- Half-Depth
+- Entropy
 
 ## Installation
 
 Download the Background repo:
 
 ```bash
-git clone https://github.com/YueyanGuo1218/Background.git
+git clone https://github.com/YueyanGuo1218/ssqc.git
 ```
 
 Install with pip:
 
 ```bash
-cd ./Background && pip install .
+cd ./ssqc && pip install .
 ```
 
 ## Usage
@@ -20,7 +25,7 @@ cd ./Background && pip install .
 Calculate backgroung for a bam file:
 
 ```bash
-ssbg /paty/to/target.bam \
+ssqc /paty/to/target.bam \
   --mask /path/to/mask.bed \
   --output /path/to/output_directory
 ```
@@ -34,5 +39,5 @@ The `output` argument specifies the output directory, defaulting to the current 
 To uninstall the package, run:
 
 ```bash
-pip uninstall Background
+pip uninstall ssqc
 ```
