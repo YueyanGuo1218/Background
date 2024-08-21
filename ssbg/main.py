@@ -1,12 +1,14 @@
 import pysam
 import numpy as np
 from pathlib import Path
-from .background import process_bam_file, calculate_background
 from .bed2array import generate_array
+from .background import process_bam_file, calculate_background
+#from .depth import calculate_depth, spikiness, half_depth_proportion, entropy
+
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Process BAM files and BED masks.')
+    parser = argparse.ArgumentParser(description='Give Strand-Seq BAM QC scores')
     parser.add_argument('input_bam', type=str, help='Input BAM file')
     parser.add_argument('--mask', type=str, default = None, help='Mask BED file')
     parser.add_argument('--output', type=str, default = ".", help='Output directory')
@@ -23,8 +25,6 @@ def main():
     else:
         bam_file = args.input_bam
 
-    ref_list, ref_lengths, watson_starts, crick_starts = process_bam_file(bam_file)
-
     # Process output arguement
     if args.output == ".":
         output_path = Path.cwd()
@@ -38,7 +38,7 @@ def main():
     else:
         bed_file = Path(args.mask)
         mask_dir = bed_file.parent
-        cache_folder_name = f"ssbg_cache_{bed_file.stem}"
+        cache_folder_name = f"ssqc_cache_{bed_file.stem}"
         cache_path = mask_dir / cache_folder_name
 
         #look for cache in the dir of bed file
@@ -48,18 +48,47 @@ def main():
             generate_array(bed_file, bam_file, chr_list, args.window_size, cache_path)
             print(f"Generating mask arrays for {args.mask}")
 
+    # Load BAM file
+    ref_list, ref_lengths, watson_starts, crick_starts = process_bam_file(bam_file)
 
+    # Measures
+    # Background
     background = calculate_background(chr_list,
                          ref_list, ref_lengths, watson_starts, crick_starts,
                          mask_dir = cache_path, bin_size = 1_000_000, read_length = 75)
+    background = f"{background:.5f}"
     print(f"Background over whole genome: {background}")
 
-    if bam_file is None:
-        with open(output_path / f"stdin_background.txt", "w") as f:
-            f.write(f"{background}")
+    # Depth
+    pass
+    depth = 0.1231
+    depth = f"{depth:.5f}"
+
+    # Spikiness
+    pass
+    spikiness = 0.1232
+    spikiness = f"{spikiness:.5f}"
+
+    # Half_depth Proportion
+    pass
+    half_depth_proportion = 0.1233
+    half_depth_proportion = f"{half_depth_proportion:.5f}"
+
+    # Entropy
+    pass
+    entropy = 0.1234
+    entropy = f"{entropy:.5f}"
+
+    head   = "\t".join(["#filename", "background", "depth", "spikiness", "half_depth_proportion", "entropy"])
+    result = "\t".join([Path(bam_file).stem, background, depth, spikiness, half_depth_proportion, entropy])
+    output_file = "\n".join([head, result])
+
+    if bam_file is None:    # Reading from stdin
+        with open(output_path / f"stdin_QC.txt", "w") as f:
+            f.write(output_file)
     else:
-        with open(output_path / f"{Path(args.input_bam).stem}_background.txt", "w") as f:
-            f.write(f"{background}")
+        with open(output_path / f"{Path(args.input_bam).stem}.tsv", "w") as f:
+            f.write(output_file)
 
 
 if __name__ == '__main__':

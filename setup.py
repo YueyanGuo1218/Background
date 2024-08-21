@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Background',
-    version='0.1.0',
+    name='ssqc',
+    version='0.2.0',
     packages=find_packages(),
     install_requires=[
         'pysam',
@@ -10,12 +10,12 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'ssbg=ssbg.main:main',
+            'ssqc=ssbg.main:main',
         ],
     },
     author='Yueyang Guo',
     author_email='pot_fe@outlook.com',
-    description='A command-line tool for calculate background for Strand-Seq BAM files',
+    description='A command-line tool for quality measure for Strand-Seq BAM files',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/YueyanGuo1218/Background',
