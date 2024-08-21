@@ -10,7 +10,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'ssqc=ssbg.main:main',
+            'ssqc=ssqc.main:main',
         ],
     },
     author='Yueyang Guo',
