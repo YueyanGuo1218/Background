@@ -6,11 +6,13 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pysam',
-        'numpy'
+        'numpy',
+        'scikit-learn'
     ],
     entry_points={
         'console_scripts': [
             'ssqc=ssqc.main:main',
+            'ssqc-merge=ssqc.cluster.main:cluster'
         ],
     },
     author='Yueyang Guo',

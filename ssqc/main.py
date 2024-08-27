@@ -76,7 +76,7 @@ def main():
     entropy = etp(chr_list, ref_list, ref_lengths, watson_starts, crick_starts)
     entropy = f"{entropy:.5f}"
 
-    head   = "\t".join(["#filename", "background", "depth", "spikiness", "half_depth_proportion", "entropy"])
+    head   = "\t".join(["filename", "background", "depth", "spikiness", "half_depth_proportion", "entropy"])
     result = "\t".join([Path(bam_file).stem, background, depth, spk, half_depth, entropy])
     output_file = "\n".join([head, result])
 
